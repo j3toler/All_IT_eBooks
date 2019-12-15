@@ -15,8 +15,10 @@ try:
     from threading import Thread
     from Queue import Queue
     import unicodedata
+    import functools
     import requests
     import logging
+    import time
     import re
 except ImportError, e:
     print "Could not import all modules: %s" % str(e)
@@ -83,11 +85,34 @@ def colorYELLOW(text):
     return colored.yellow(text)
 
 
-def main():
+#################### Define Logging Decorator #################
+def log_and_time(func):
+    """
+       This decorator is used to log the arguments passed to the function, 
+        as well as the time it takes to complete.
+    """
+    @functools.wraps(func)
+    def wrapper_timing(*args, **kwargs):
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = ["{}={}".format(k,v) for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        logger.info("Started the function {}({}).".format(func.__name__, signature))
+        start_time = time.time()
+        vals = func(*args, **kwargs)
+        end_time = time.time()
+        run_time = end_time - start_time
+        logger.info("Finished the function '{}' in {:.4f} secs".format(func.__name__, run_time))
+        return vals
+    return wrapper_timing
+
+
+#################### Define some Functions ####################
+def main(name, age=None):
     """
        MISSING DESCRIPTION
     """
     pass
+
 
 if __name__ == "__main__":
     pass
