@@ -123,35 +123,94 @@ def slugify(string):
 @log_and_time
 def getChoices():
     """
-       Takes no input, returns some input
+       Function takes no input, and returns a tuple of length 3.
        
-       This displays the list of available categories still left to be chosen,
-        and prompts the user to either finish their choice or keep choosing categories.
+       return_tuple[0] = <list>     # final choices of categories
+       return_tuple[1] = <bool>     # verbose output
+       return_tuple[2] = <bool>     # summary at end
        
-       Additionally, asks the user if they would like to enable Verbose and/or Summary mode
+       This function displays the list of available categories still left to be chosen,
+        and prompts the user to either finish choosing or keep choosing categories.
        
-       [_] FUNCITONAL
+       Additionally, asks the user if they would like to enable Verbose and/or Summary mode.
+       
+       [X] FUNCITONAL
        [_] UNDER CONSTRUCTION
+       [*] COMPLETED TESTING
+       
+       * Manual testing completed. No Unit Testing has been done for this function.
     """
-    pass
+    all_choices = categories.keys()
+    choices_deque = deque(all_choices)
+    choices_final = []
+    while len(choices_deque) != 2:
+        system('cls')
+        print "Please choose a category for download from the list"
+        for i, category in enumerate(choices_deque):
+            line = "{1: >{2}}.\t{0}".format(category, i, 2)
+            print line
+
+        try:
+            choice = int(raw_input("Choice: "))
+        except:
+            choice = 0
+        finally:
+            valids = range(len(choices_deque))
+            if choice not in valids:
+                choice = 0
+
+        if choice == 0:
+            break
+
+        selection = choices_deque[choice]
+        if selection == "All":
+            choices_final = all_choices[2:]
+            break
+        else:
+            choices_final.append(selection)
+            choices_deque.remove(selection)
+
+    system('cls')
+
+    verbose = raw_input("Would you like to make things more Verbose? (Y/n) ").strip()
+    if len(verbose) == 0:
+        verbose = True
+    elif verbose[0].lower() == 'y':
+        verbose = True
+    else:
+        verbose = False
+
+    summary = raw_input("\nHow about a brief summary of the entries that did't work? (Y/n) ").strip()
+    if len(summary) == 0:
+        summary = True
+    elif summary[0].lower() == 'y':
+        summary = True
+    else:
+        summary = False
+
+    return choices_final, verbose, summary
 
 
+@log_and_time
 def processEntry(entry):
     """
        MISSING DESCRIPTION
        
        [_] FUNCITONAL
        [_] UNDER CONSTRUCTION
+       [_] COMPLETED TESTING
     """
     pass
 
 
+@log_and_time
 def processEntirePage(page):
     """
        MISSING DESCRIPTION
        
        [_] FUNCITONAL
        [_] UNDER CONSTRUCTION
+       [_] COMPLETED TESTING
     """
     pass
 
@@ -159,6 +218,10 @@ def processEntirePage(page):
 def main():
     """
        MISSING DESCRIPTION
+       
+       [_] FUNCITONAL
+       [_] UNDER CONSTRUCTION
+       [_] COMPLETED TESTING
     """
     pass
 
