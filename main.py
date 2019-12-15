@@ -22,6 +22,38 @@ except ImportError, e:
     print "Could not import all modules: %s" % str(e)
     exit(0)
 
+
+#################### Define some Colors ####################
+def colorRED(text):
+    """
+       returns the string of text in the color RED
+
+       input <string>
+       output <string>
+    """
+    return colored.red(text)
+
+
+def colorGREEN(text):
+    """
+       returns the string of text in the color GREEN
+
+       input <string>
+       output <string>
+    """
+    return colored.green(text)
+
+
+def colorYELLOW(text):
+    """
+       returns the string of text in the color YELLOW
+
+       input <string>
+       output <string>
+    """
+    return colored.yellow(text)
+
+
 def main():
     """
        MISSING DESCRIPTION
