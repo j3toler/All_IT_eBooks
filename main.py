@@ -107,7 +107,7 @@ def log_and_time(func):
 
 
 #################### Define some Functions ####################
-def main(name, age=None):
+def main():
     """
        MISSING DESCRIPTION
     """
