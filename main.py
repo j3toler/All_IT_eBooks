@@ -204,15 +204,30 @@ def processEntry(entry):
 
 
 @log_and_time
-def processEntirePage(page):
+def processEntirePage(page, q):
     """
-       MISSING DESCRIPTION
+       Function takes a URL and a Queue as input, and returns True always.
        
-       [_] FUNCITONAL
-       [_] UNDER CONSTRUCTION
-       [_] COMPLETED TESTING
+       This function uses the requests library to get the HTML back from the 
+        given URL and parses the information. Once properly parsed, it finds
+        all of the <article> tags. This is where the information for the ebooks
+        are held. Next up, puts each article content found into a queue for 
+        later processing.
+
+       page = <string>
+       q = Queue()
+       
+       [/] FUNCITONAL
+       [/] UNDER CONSTRUCTION
+       [*] COMPLETED TESTING
+       
+       * Some manual testing has been done. No Unit tests have been made.
     """
-    pass
+    source = requests.get(page).text
+    soup = bs(source, 'lxml')
+    entries = soup.find_all('article')
+    map(q.put, entries)
+    return True
 
 
 def main():
@@ -224,7 +239,6 @@ def main():
        [_] COMPLETED TESTING
     """
     pass
-
 
 if __name__ == "__main__":
     pass
