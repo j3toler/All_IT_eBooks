@@ -320,20 +320,61 @@ def processEntirePage(page, q):
     return True
 
 
+@log_and_time
 def main():
     """
        MISSING DESCRIPTION
        
-       [_] FUNCITONAL
-       [_] UNDER CONSTRUCTION
-       [_] COMPLETED TESTING
+       [X] FUNCITONAL
+       [/] UNDER CONSTRUCTION
+       [*] COMPLETED TESTING
+
+       * Some manual testing has been done. No Unit tests have been made.
     """
     global VERBOSE
     global SUMMARY
     global ERRORS
     ERRORS = []
+    MAX_THREADS = 20
+    
+    choices, VERBOSE, SUMMARY = getChoices()
+    
+    for category in choices:
+        global BASEPATH
+        BASEPATH = "C:\\tmp\\" + category + "\\"
+        category_queue = Queue()
+
+        try:
+            makedirs(BASEPATH)
+        except:
+            logger.warning("Failed to create directories.")
+            pass
+
+        base_URL = "http://www.allitebooks.com/{}/page/".format(category.lower())
+        max_page = categories[category]
+        for page_number in range(1,max_page):
+            target_page = base_URL + str(page_number) + "/"
+            print "Target:", target_page
+            processEntirePage(target_page, category_queue)
+        
+        for _ in range(MAX_THREADS):
+            t = Thread(target=worker, args=(category_queue,))
+            t.start()
+
+        category_queue.join()
+
+    if SUMMARY:
+        system('pause')
+        logger.info("Starting Summary")
+        print("Now displaying errors...")
+        for title in ERRORS:
+            print(small_break)
+            print(title)
+        print(big_break)
+        logger.info("Finished Summary")
+    print("Finished!\nExiting...")
     return True
 
 
 if __name__ == "__main__":
-    pass
+    main()
