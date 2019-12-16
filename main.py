@@ -191,16 +191,89 @@ def getChoices():
     return choices_final, verbose, summary
 
 
+def worker(q):
+    while not q.empty():
+        entry = q.get()
+        return_dict = processEntry(entry)
+        q.task_done()
+
+
 @log_and_time
-def processEntry(entry):
+def processEntry(entry_contents):
     """
-       MISSING DESCRIPTION
+       Takes a dictionary as input, and returns a dictionary as output.
        
-       [_] FUNCITONAL
+       Honestly, the input/output shit is probably going to change soon.
+        I've got an idea about making a database of the results, but that's for
+        a later iteration. For now, I'm just going to move on from here...
+       
+       [X] FUNCITONAL
        [_] UNDER CONSTRUCTION
-       [_] COMPLETED TESTING
+       [*] COMPLETED TESTING
+
+       * Manual testing completed. No Unit Testing has been done for this function.
     """
-    pass
+    return_dict = {"title": None, "small description": None, "save result": None}
+    title, small_description, next_link = entry_contents['title'], entry_contents["small description"], entry_contents["next link"]
+    next_page = requests.get(next_link).text
+    next_soup = bs(next_page, 'lxml')
+    next_entry = next_soup.find('article')
+    found = None
+    for potential_link in next_entry.find_all('a', href=True):
+        if re.match(pattern_PDF, potential_link['href']):
+            found = potential_link['href']
+            break
+    if not found:
+        return_dict["save result"] = False
+        if SUMMARY:
+            ERRORS.append(title)
+        if VERBOSE:
+            print(colorRED("[!] FILE NOT FOUND: " + title))
+            print(small_break)
+        logger.error("File Not Found: {}".format(title))
+        return return_dict
+    if VERBOSE:
+        print(colorGREEN("File: " + found))
+        print(small_break)
+    fName = "{}.{}".format(slugify(title), 'pdf')
+    pathDir = BASEPATH + fName
+    if path.isfile(pathDir):
+        if VERBOSE:
+            print(colorYELLOW("[!] PDF already exists!"))
+        logger.warning("File already exists: {}".format(title))
+        return return_dict
+    else:
+        if VERBOSE:
+            print(colorYELLOW("[_] Writing file to directory..."))
+        try:
+            r = requests.get(found, stream=True)
+            if r.status_code == 404:
+                ERRORS.append(title)
+                if VERBOSE:
+                    print(colorRED("File returned a 404: {}".format(title)))
+                return_dict["save result"] = False
+                logger.error("File returned a 404: {}".format(title))
+                return return_dict
+            with open(pathDir, 'wb') as fd:
+                for chunk in r.iter_content(2048):
+                    fd.write(chunk)
+            return_dict['save result'] = True
+            if VERBOSE:
+                print(colorGREEN("[+] Wrote File to Directory"))
+        except:
+            if SUMMARY:
+                ERRORS.append(title)
+            if VERBOSE:
+                print(colorRED("[!] Something went wrong..."))
+            logger.error("Could not write to file: {}".format(title))
+            return_dict['result'] = False
+        finally:
+            if VERBOSE:
+                print_title = unicodedata.normalize("NFKD", title).encode('ascii', 'ignore')
+                print("Title: {}".format(print_title))
+                print("Small Description: {}".format(small_description))
+                print(big_break)
+            return return_dict
 
 
 @log_and_time
@@ -223,8 +296,8 @@ def processEntirePage(page, q):
        page = <string>
        q = Queue()
        
-       [/] FUNCITONAL
-       [/] UNDER CONSTRUCTION
+       [X] FUNCITONAL
+       [_] UNDER CONSTRUCTION
        [*] COMPLETED TESTING
        
        * Some manual testing has been done. No Unit tests have been made.
@@ -255,7 +328,11 @@ def main():
        [_] UNDER CONSTRUCTION
        [_] COMPLETED TESTING
     """
-    pass
+    global VERBOSE
+    global SUMMARY
+    global ERRORS
+    ERRORS = []
+    return True
 
 
 if __name__ == "__main__":
