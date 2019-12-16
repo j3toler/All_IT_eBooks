@@ -107,6 +107,55 @@ def log_and_time(func):
 
 
 #################### Define some Functions ####################
+@log_and_time
+def slugify(string):
+    """
+       Normalizes string, converts to lowercase, removes non-alpha characters,
+        and converts spaces to hyphens.
+    """
+    value = string[:]
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
+    value = unicode(re.sub('[-\s]+', '-', value))
+    return value
+
+
+@log_and_time
+def getChoices():
+    """
+       Takes no input, returns some input
+       
+       This displays the list of available categories still left to be chosen,
+        and prompts the user to either finish their choice or keep choosing categories.
+       
+       Additionally, asks the user if they would like to enable Verbose and/or Summary mode
+       
+       [_] FUNCITONAL
+       [_] UNDER CONSTRUCTION
+    """
+    pass
+
+
+def processEntry(entry):
+    """
+       MISSING DESCRIPTION
+       
+       [_] FUNCITONAL
+       [_] UNDER CONSTRUCTION
+    """
+    pass
+
+
+def processEntirePage(page):
+    """
+       MISSING DESCRIPTION
+       
+       [_] FUNCITONAL
+       [_] UNDER CONSTRUCTION
+    """
+    pass
+
+
 def main():
     """
        MISSING DESCRIPTION
