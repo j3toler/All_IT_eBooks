@@ -211,8 +211,14 @@ def processEntirePage(page, q):
        This function uses the requests library to get the HTML back from the 
         given URL and parses the information. Once properly parsed, it finds
         all of the <article> tags. This is where the information for the ebooks
-        are held. Next up, puts each article content found into a queue for 
-        later processing.
+        are held. Next up, it grabs a few items from the article and puts it in
+        a dictionary:
+         1. title
+         2. small description
+         3. next link
+        
+        Once it has these things, it appends it to a final list and passes 
+        the list of dicts into a queue for later processing.
 
        page = <string>
        q = Queue()
@@ -223,10 +229,21 @@ def processEntirePage(page, q):
        
        * Some manual testing has been done. No Unit tests have been made.
     """
+    passed_values = []
+
     source = requests.get(page).text
     soup = bs(source, 'lxml')
     entries = soup.find_all('article')
-    map(q.put, entries)
+    for entry in entries:
+        contents = {"title": None, "small description": None, "next link": None}
+        title = entry.h2.text
+        contents['title'] = title
+        small_description = unicodedata.normalize("NFKD", entry.p.text).encode('ascii', 'ignore')
+        contents['small description'] = small_description
+        next_link = entry.find('a', href=True)['href']
+        contents['next link'] = next_link
+        passed_values.append(contents)
+    map(q.put, passed_values)
     return True
 
 
@@ -239,6 +256,7 @@ def main():
        [_] COMPLETED TESTING
     """
     pass
+
 
 if __name__ == "__main__":
     pass
